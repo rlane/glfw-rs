@@ -632,7 +632,11 @@ impl Glfw {
     pub fn get_proc_address(&self, procname: &str) -> Option<GLProc> {
         unsafe {
             procname.with_c_str(|procname| {
-                ffi::glfwGetProcAddress(procname)
+                let fnptr = ffi::glfwGetProcAddress(procname);
+                match fnptr as *() {
+                    x if x.is_null() => None,
+                    _ => Some(fnptr)
+                }
             })
         }
     }
